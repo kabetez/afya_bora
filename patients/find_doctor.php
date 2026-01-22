@@ -48,7 +48,7 @@ $doctors_res = mysqli_query($conn, $query);
                 <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #1a3a5a;">
                     <h3 style="margin: 0;">Dr. <?php echo $doc['username']; ?></h3>
                     <p style="color: #e74c3c; font-weight: bold; margin: 5px 0;"><?php echo $doc['specialty']; ?></p>
-                    <p style="color: #666; font-size: 0.9rem;"> <?php echo $doc['hospital_name']; ?></p>
+                    <p style="color: #666; font-size: 0.9rem;">📍 <?php echo $doc['hospital_name']; ?></p>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
                     <a href="book_appointment.php?doc_id=<?php echo $doc['id']; ?>" 
                        style="display: block; text-align: center; background: #1a3a5a; color: white; text-decoration: none; padding: 10px; border-radius: 5px;">

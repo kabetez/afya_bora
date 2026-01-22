@@ -2,64 +2,62 @@
 session_start();
 require_once 'config/db.php';
 
-// 1. SECURITY & SESSION CHECK
+// 1. Security Check: Ensure user is logged in AND is a doctor
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
-    header("Location: login.php?error=Unauthorized Access");
+    header("Location: login.php?error=Access Denied");
     exit();
 }
 
-$u_id = $_SESSION['user_id'];
-$username = $_SESSION['username'];
+// KMPDC license
+$user_id = $_SESSION['user_id'];
+$doctor_q = mysqli_query($conn, "SELECT license_no FROM users WHERE id = '$user_id'");
+$doctor_data = mysqli_fetch_assoc($doctor_q);
 
-// 2. FETCH DOCTOR PROFILE INFO
-$doc_query = "SELECT license_no, specialty, hospital_name FROM users WHERE id = '$u_id'";
-$doc_res = mysqli_query($conn, $doc_query);
-$doc = mysqli_fetch_assoc($doc_res);
+// 2. Fetch Live Stats for the National System
+// Count total citizens in the registry
+$total_q = mysqli_query($conn, "SELECT COUNT(*) as total FROM patients");
+$total_citizens = mysqli_fetch_assoc($total_q)['total'];
 
+// Count total medical encounters logged across the country
+$records_q = mysqli_query($conn, "SELECT COUNT(*) as total FROM national_health_records");
+$total_records = mysqli_fetch_assoc($records_q)['total'];
 
-// 3. STATS COUNTERS
-$total_p = 0;
-$total_r = 0;
-$p_count_res = mysqli_query($conn, "SELECT COUNT(*) as total FROM patients");
-if($p_count_res) { $total_p = mysqli_fetch_assoc($p_count_res)['total']; }
+// Count patients by County for the analytics table
+$county_sql = "SELECT county, COUNT(*) as count FROM patients GROUP BY county ORDER BY count DESC LIMIT 5";
+$county_result = mysqli_query($conn, $county_sql);
 
-$r_count_res = mysqli_query($conn, "SELECT COUNT(*) as total FROM national_health_records");
-if($r_count_res) { $total_r = mysqli_fetch_assoc($r_count_res)['total']; }
+if (isset($_POST['save_record_btn'])) {
+    $p_id = $_POST['patient_id'];
+    $diag = mysqli_real_escape_string($conn, $_POST['diagnosis']);
+    $treat = mysqli_real_escape_string($conn, $_POST['treatment']);
+    $doc = $_SESSION['username'];
 
-// 4. FETCH PENDING APPOINTMENTS (Safety Logic added here)
-$appointments_res = null; 
-$app_sql = "SELECT a.id as app_id, a.app_date, a.reason, p.full_name, p.national_id 
-            FROM appointments a 
-            JOIN patients p ON a.patient_id = p.patient_id 
-            WHERE a.doctor_id = '$u_id' AND a.status = 'Pending'
-            ORDER BY a.app_date ASC";
-
-$appointments_res = mysqli_query($conn, $app_sql);
-
-// 5. FETCH RECENT NATIONAL RECORDS
-$recent_records = mysqli_query($conn, "SELECT * FROM national_health_records ORDER BY created_at DESC LIMIT 5");
+    // This sends the data to the prescriptions table for the pharmacist
+    $sql = "INSERT INTO prescriptions (patient_id, doctor_name, diagnosis, treatment, status) 
+            VALUES ('$p_id', '$doc', '$diag', '$treat', 'Pending')";
+    
+    mysqli_query($conn, $sql);
+}
 ?>
-<?php if (isset($_GET['msg'])): ?>
-    <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-        ✅ <?php echo htmlspecialchars($_GET['msg']); ?>
-    </div>
-<?php endif; ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Afya Hub | Medical Practitioner Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afya Poa | National Health Dashboard</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="dashboard-page">
 
     <nav class="navbar">
         <div class="nav-container">
-            <a href="doctor_dashboard.php" class="nav-logo">Afya <span>Hub</span></a>
+            <a href="doctor_dashboard.php" class="nav-logo">Afya <span>Poa</span></a>
+            
             <ul class="nav-links">
-                <li><a href="doctor_dashboard.php" class="active">Dashboard</a></li>
-                <li><a href="patients/add.php">Register Citizen</a></li>
+                <li><a href="doctor_dashboard.php">Dashboard</a></li>
+                <li><a href="patients/search.php">Search Registry</a></li>
+                <li><a href="patients/add.php">New Registration</a></li>
                 <li><a href="logout.php" class="logout-link">Logout</a></li>
             </ul>
         </div>
@@ -67,79 +65,87 @@ $recent_records = mysqli_query($conn, "SELECT * FROM national_health_records ORD
 
     <div class="dashboard-wrapper">
         <aside class="sidebar">
-            <h4 style="color: #bdc3c7; border-bottom: 1px solid #444; padding-bottom: 10px;">Clinical Tools</h4>
-            <a href="doctor_dashboard.php" class="sidebar-link active">🏠 Overview</a>
-            <a href="patients/search.php" class="sidebar-link">🔍 Patient Search</a>
-            <a href="add_record.php" class="sidebar-link">✍️ Write Prescription</a>
+            <h4 style="border-bottom: 1px solid #ffffff55; padding-bottom: 10px; margin-top: 0;">Registry Tools</h4>
+            <a href="doctor_dashboard.php" class="sidebar-link active"> System Home</a>
+            <a href="patients/search.php" class="sidebar-link"> Search National ID</a>
+            <a href="patients/add.php" class="sidebar-link"> Register Citizen</a>
+            <a href="#" class="sidebar-link"> Disease Surveillance</a>
+            <a href="#" class="sidebar-link"> Account Settings</a>
             
-            <div style="margin-top: auto; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                <p style="margin: 0; color: #888; font-size: 0.8rem;">Practitioner:</p>
-                <p style="margin: 5px 0 0 0; color: white; font-weight: bold;">Dr. <?php echo $username; ?></p>
-                <p style="margin: 3px 0 0 0; color: #3498db; font-size: 0.75rem;"><?php echo $doc['specialty'] ?? 'General Practitioner'; ?></p>
-                <p style="margin: 3px 0 0 0; color: #999; font-size: 0.7rem;"><?php echo $doc['hospital_name'] ?? 'National Hospital'; ?></p>
+            <div style="margin-top: auto; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.8rem;">
+                <p style="margin: 0; color: #ffcccc;">Status: Verified Practitioner</p>
+                <p style="margin: 5px 0 0 0; color: white;">ID: <?php echo $doctor_data['license_no']; ?></p>
             </div>
         </aside>
 
-        <main style="flex: 1; padding: 25px; background: #f4f7f6; overflow-y: auto;">
+        <main class="container" style="padding: 25px; flex: 1;">
             
-            <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 10px solid #1a3a5a; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h2 style="margin:0; color: #1a3a5a;">Clinical Command Centre</h2>
-                <p style="color: #666; margin-top: 5px;">License: <strong><?php echo $doc['license_no'] ?? 'N/A'; ?></strong> | Status: <span style="color: green;">● Online</span></p>
-            </div>
+            <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 10px solid var(--accent-maroon); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h1 style="margin:0; color: var(--primary-blue);">National Health Intelligence</h1>
+                <p style="color: #666; margin-top: 5px;">Welcome, <strong>Dr. <?php echo $_SESSION['username']; ?></strong>. License: <?php echo $doctor_data['license_no']; ?> | <span style="color: green;">● Server Active</span></p>
 
-            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #3498db;">
-                    <h3 style="margin:0; font-size: 2rem;"><?php echo $total_p; ?></h3>
-                    <p style="margin:5px 0 0 0; color: #777;">Registered Citizens</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3><?php echo number_format($total_citizens); ?></h3>
+                    <p>Total Citizens Registered</p>
                 </div>
-                <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #e74c3c;">
-                    <h3 style="margin:0; font-size: 2rem;"><?php echo $total_r; ?></h3>
-                    <p style="margin:5px 0 0 0; color: #777;">National Records</p>
+                <div class="stat-card">
+                    <h3><?php echo number_format($total_records); ?></h3>
+                    <p>Clinical Encounters</p>
                 </div>
-                <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #f1c40f;">
-                    <h3 style="margin:0; font-size: 2rem;">
-                        <?php echo ($appointments_res) ? mysqli_num_rows($appointments_res) : 0; ?>
-                    </h3>
-                    <p style="margin:5px 0 0 0; color: #777;">Pending Visits</p>
+                <div class="stat-card">
+                    <h3 style="color: var(--accent-maroon);">47</h3>
+                    <p>Counties Synced</p>
                 </div>
             </div>
 
-            <div class="dashboard-card" style="margin-top: 25px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <h3 style="color: #1a3a5a; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0;">📅 Physical Visit Requests</h3>
-                <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                    <thead>
-                        <tr style="text-align: left; background: #f8f9fa;">
-                            <th style="padding: 12px;">Citizen Name</th>
-                            <th style="padding: 12px;">Date</th>
-                            <th style="padding: 12px;">Reason</th>
-                            <th style="padding: 12px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if($appointments_res && mysqli_num_rows($appointments_res) > 0): ?>
-                            <?php while($app = mysqli_fetch_assoc($appointments_res)): ?>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px;">
-                                    <strong><?php echo $app['full_name']; ?></strong><br>
-                                    <small style="color: #888;">ID: <?php echo $app['national_id']; ?></small>
-                                </td>
-                                <td style="padding: 12px;"><?php echo date('d M Y', strtotime($app['app_date'])); ?></td>
-                                <td style="padding: 12px;"><?php echo $app['reason']; ?></td>
-                                <td style="padding: 12px;">
-                                    <a href="manage_app.php?id=<?php echo $app['app_id']; ?>&status=Confirmed" style="color: green; text-decoration: none; font-weight: bold;">Accept</a>
-                                </td>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 25px;">
+                
+                <div class="dashboard-card" style="margin: 0;">
+                    <h3 style="color: var(--primary-blue); margin-top: 0;">Registry Operations</h3>
+                    <p style="color: #555; line-height: 1.6;">You are currently accessing the central health data nodes. All clinical encounters logged here are part of the National Electronic Health Record (NEHR).</p>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <a href="patients/search.php" style="background: var(--primary-blue); color: white; padding: 14px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; flex: 1; text-align: center; transition: 0.3s;">
+                            Open Central Search
+                        </a>
+                        <a href="patients/add.php" style="background: var(--accent-maroon); color: white; padding: 14px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; flex: 1; text-align: center; transition: 0.3s;">
+                            Register New Citizen
+                        </a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card" style="margin: 0;">
+                    <h4 style="margin-top: 0; color: var(--accent-maroon); border-bottom: 1px solid #eee; padding-bottom: 10px;">Top Registry Localities</h4>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="text-align: left; color: #777; border-bottom: 1px solid #eee;">
+                                <th style="padding: 10px 0;">County</th>
+                                <th style="padding: 10px 0; text-align: right;">Citizens</th>
                             </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">No visit requests found.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php if(mysqli_num_rows($county_result) > 0): ?>
+                                <?php while($row = mysqli_fetch_assoc($county_result)): ?>
+                                <tr style="border-bottom: 1px solid #f9f9f9;">
+                                    <td style="padding: 12px 0; color: #333;"><?php echo $row['county'] ?: 'Unassigned'; ?></td>
+                                    <td style="padding: 12px 0; text-align: right; font-weight: bold; color: var(--primary-blue);">
+                                        <?php echo number_format($row['count']); ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="2" style="padding: 20px; text-align: center; color: #999;">No geographic data available</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </main>
     </div>
+
 </body>
 </html>
