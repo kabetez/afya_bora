@@ -38,7 +38,7 @@ if (isset($_POST['login_btn'])) {
 </head>
 <body style="background:#f0f2f5; display:flex; align-items:center; justify-content:center; height:100vh;">
     <div style="background:white; padding:30px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); width:350px;">
-        <h2 style="text-align:center; color:#1a3a5a;">Afya Poa Hub</h2>
+        <h2 style="text-align:center; color:#1a3a5a;">Afya Bora Hub</h2>
         <?php if($error) echo "<p style='color:red; font-size:0.8rem;'>$error</p>"; ?>
         <?php if(isset($_GET['success'])) echo "<p style='color:green; font-size:0.8rem;'>".$_GET['success']."</p>"; ?>
 

@@ -35,7 +35,7 @@ if (isset($_POST['search_btn'])) {
 
     <nav class="navbar">
         <div class="nav-container">
-            <span class="nav-logo">Afya Poa | National Health System</span>
+            <span class="nav-logo">Afya Bora | National Health System</span>
             <ul class="nav-links">
                 <li><a href="../doctor_dashboard.php">Dashboard</a></li>
                 <li><a href="add.php">New Citizen Entry</a></li>

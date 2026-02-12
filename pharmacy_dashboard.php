@@ -12,12 +12,13 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'pharmacist') {
 // Note: Ensure your table is named 'national_health_records' or 'prescriptions'
 $prescriptions_sql = "SELECT r.*, p.full_name, p.national_id 
                       FROM national_health_records r
-                      JOIN patients p ON r.national_id = p.national_id 
+                      JOIN patients p ON r.national_id = p.national_id
+                      WHERE r.status = 'Pending'
                       ORDER BY r.created_at DESC LIMIT 10";
 $prescriptions_res = mysqli_query($conn, $prescriptions_sql);
 
 // 3. STATS: Total count
-$total_q = mysqli_query($conn, "SELECT COUNT(*) as total FROM national_health_records");
+$total_q = mysqli_query($conn, "SELECT COUNT(*) as total FROM national_health_records WHERE status='Pending'");
 $total_dispensed = mysqli_fetch_assoc($total_q)['total'] ?? 0;
 ?>
 
@@ -25,7 +26,7 @@ $total_dispensed = mysqli_fetch_assoc($total_q)['total'] ?? 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Afya Poa | Pharmacy Portal</title>
+    <title>Afya Bora | Pharmacy Portal</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="dashboard-page">
@@ -42,42 +43,40 @@ $total_dispensed = mysqli_fetch_assoc($total_q)['total'] ?? 0;
     </nav>
 
     <div class="dashboard-wrapper">
-        <aside class="sidebar" style="background-color: #004d40;">
-            <h4 style="color: #b2dfdb; border-bottom: 1px solid #4db6ac; padding-bottom: 10px; margin-top:0;">Pharmacy Tools</h4>
+        <aside class="sidebar" style="background-color: var(--primary-blue);">
+            <h4 style="color: #ffffff; border-bottom: 1px solid #ffffff55; padding-bottom: 10px; margin-top:0;">Pharmacy Tools</h4>
             <a href="pharmacy_dashboard.php" class="sidebar-link active"> Dispensing Queue</a>
             <a href="patients/search.php" class="sidebar-link"> Search Patient</a>
             <a href="patients/add.php" class="sidebar-link"> Registration Citizen</a>
             <a href="dispense_history.php" class="sidebar-link">Dispense History</a>
             
             <div style="margin-top: auto; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                <p style="margin: 0; color: #b2dfdb; font-size: 0.8rem;">Logged in as:</p>
+                <p style="margin: 0; color: #ffffffcc; font-size: 0.8rem;">Logged in as:</p>
                 <p style="margin: 5px 0 0 0; color: white; font-weight: bold;">Pharm. <?php echo htmlspecialchars($_SESSION['username']); ?></p>
             </div>
         </aside>
 
-        <main style="flex: 1; padding: 20px; background-color: #f8f9fa; overflow-y: auto;">
+        <main style="flex: 1; padding: 20px; background-color: #f8f9fa; overflow-y: auto; max-width: none; margin: 0;">
             
-            <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 10px solid #00796b; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h1 style="margin:0; color: #004d40;">National Pharmacy Portal</h1>
-                <p style="color: #666; margin-top: 5px;">Authenticated Terminal | <span style="color: green;">? Live Connection</span></p>
+            <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 10px solid var(--accent-maroon); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h1 style="margin:0; color: var(--primary-blue);">National Pharmacy Portal</h1>
+                <p style="color: #666; margin-top: 5px; text-align: justify;">Authenticated Terminal | <span style="color: green;">Live Connection</span></p>
             </div>
 
             <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #00796b; text-align: center;">
+                <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid var(--accent-maroon); text-align: center;">
                     <h3 style="font-size: 2rem; margin: 0;"><?php echo $total_dispensed; ?></h3>
                     <p style="color: #666; margin: 5px 0 0 0;">Prescriptions Synced</p>
                 </div>
                 <div class="stat-card" style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-                    <h3 style="color: #00796b; font-size: 2rem; margin: 0;">Active</h3>
+                    <h3 style="color: var(--primary-blue); font-size: 2rem; margin: 0;">Active</h3>
                     <p style="color: #666; margin: 5px 0 0 0;">PPB Registry Status</p>
                 </div>
             </div>
 
-            <div class="dashboard-card" style="margin-top: 25px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h3 style="color: #004d40; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0;">National Dispensing Queue</h3>
-                
-                <div style="overflow-x: auto; width: 100%;"> 
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 800px;">
+            <div class="dashboard-card" style="margin: 25px 0 0; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: left;">
+                <h3 style="color: var(--primary-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0; text-align: justify;">National Dispensing Queue</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
                         <thead>
                             <tr style="text-align: left; background: #f4f7f6; color: #555;">
                                 <th style="padding: 12px; border-bottom: 2px solid #ddd;">Citizen Name</th>
@@ -97,7 +96,7 @@ $total_dispensed = mysqli_fetch_assoc($total_q)['total'] ?? 0;
                                     <td style="padding: 15px;">Dr. <?php echo $row['doctor_name'] ?? 'System'; ?></td>
                                     <td style="padding: 15px;">
                                         <a href="dispense.php?id=<?php echo $row['record_id']; ?>" 
-                                           style="display: inline-block; background: #00796b; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
+                                           style="display: inline-block; background: var(--primary-blue); color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
                                            Dispense 
                                         </a>
                                     </td>
@@ -110,7 +109,6 @@ $total_dispensed = mysqli_fetch_assoc($total_q)['total'] ?? 0;
                             <?php endif; ?>
                         </tbody>
                     </table>
-                </div>
             </div>
         </main>
     </div>

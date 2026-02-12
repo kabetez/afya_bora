@@ -23,70 +23,80 @@ $history_res = mysqli_query($conn, $history_sql);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Afya Poa | Citizen Health Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afya Bora | Citizen Health Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { max-width: 100%; overflow-x: hidden; }
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .dashboard-wrapper { width: 100%; max-width: 100%; overflow-x: hidden; }
+        .patient-main { min-width: 0; }
+        .patient-stats { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; }
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
         .badge-verified { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .timeline-card { transition: transform 0.2s ease, box-shadow 0.2s ease; border: 1px solid #e2e8f0; }
         .timeline-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 8px; transition: 0.3s; color: #cbd5e1; text-decoration: none; margin-bottom: 5px; }
-        .sidebar-link:hover, .sidebar-link.active { background: #475569; color: white; }
+        .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 8px; transition: 0.3s; color: #e2f2ef; text-decoration: none; margin-bottom: 5px; }
+        .sidebar-link:hover, .sidebar-link.active { background: #00796b; color: white; }
+        @media (max-width: 1024px) {
+            .dashboard-wrapper { flex-direction: column; }
+            .sidebar { width: 100% !important; }
+            .patient-main { padding: 20px !important; }
+        }
     </style>
 </head>
 <body class="dashboard-page">
 
-    <nav class="navbar" style="background: #0f172a; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; color: white;">
-        <a href="patient_portal.php" class="nav-logo" style="font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none;">Afya <span style="color: #38bdf8;">Poa</span></a>
+    <nav class="navbar" style="background: var(--primary-blue); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; color: white;">
+        <a href="patient_portal.php" class="nav-logo" style="font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none;">Afya <span style="color: #b2dfdb;">Poa</span></a>
         <div style="display: flex; gap: 20px; align-items: center;">
             <span style="font-size: 0.9rem; color: #94a3b8;">Welcome back, <?php echo explode(' ', $patient['full_name'])[0]; ?></span>
-            <a href="logout.php" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">Logout</a>
+            <a href="logout.php" style="background: var(--accent-maroon); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">Logout</a>
         </div>
     </nav>
 
     <div class="dashboard-wrapper" style="display: flex; min-height: calc(100vh - 70px);">
-        <aside class="sidebar" style="width: 260px; background: #1e293b; padding: 25px; display: flex; flex-direction: column;">
-            <h4 style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 20px;">Main Menu</h4>
-            <a href="patient_portal.php" class="sidebar-link active"><span>📅</span> Health Timeline</a>
-            <a href="#" class="sidebar-link"><span>👨‍👩‍👧‍👦</span> Dependents</a>
-            <a href="#" class="sidebar-link"><span>💳</span> Health Card</a>
-            <a href="#" class="sidebar-link"><span>⚙️</span> Settings</a>
+        <aside class="sidebar" style="width: 260px; background: var(--primary-blue); padding: 25px; display: flex; flex-direction: column;">
+            <h4 style="color: #b2dfdb; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 20px;">Main Menu</h4>
+            <a href="patient_portal.php" class="sidebar-link active"> Health Timeline</a>
+            <a href="dependants.php" class="sidebar-link">Dependents</a></li>
+           
             
-            <div style="margin-top: auto; padding: 15px; background: #334155; border-radius: 12px; border: 1px solid #475569;">
-                <p style="margin: 0; color: #94a3b8; font-size: 0.75rem;">Identity Verified</p>
+            <div style="margin-top: auto; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                <p style="margin: 0; color: #b2dfdb; font-size: 0.75rem;">Identity Verified</p>
                 <p style="margin: 4px 0 0 0; color: white; font-weight: 600; font-size: 0.9rem;"><?php echo $patient['full_name']; ?></p>
             </div>
         </aside>
 
-        <main style="flex: 1; padding: 40px; overflow-y: auto;">
+        <main class="patient-main" style="flex: 1; padding: 40px; overflow-y: auto;">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
-                    <h1 style="margin: 0; color: #1e293b; font-size: 1.8rem;">Personal Health Records</h1>
+                    <h1 style="margin: 0; color: var(--primary-blue); font-size: 1.8rem;">Personal Health Records</h1>
                     <p style="color: #64748b; margin-top: 5px;">National Identifier: <strong><?php echo $national_id; ?></strong></p>
                 </div>
                 <div class="status-badge badge-verified">✓ Registry Verified</div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
-                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid #3b82f6;">
+            <div class="patient-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid #00796b;">
                     <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Blood Group</p>
-                    <h2 style="margin: 5px 0 0 0; color: #1e293b;"><?php echo $patient['blood_group'] ?? 'N/A'; ?></h2>
+                    <h2 style="margin: 5px 0 0 0; color: var(--primary-blue);"><?php echo $patient['blood_group'] ?? 'N/A'; ?></h2>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid #10b981;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid var(--primary-blue);">
                     <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Total Visits</p>
-                    <h2 style="margin: 5px 0 0 0; color: #1e293b;"><?php echo mysqli_num_rows($history_res); ?></h2>
+                    <h2 style="margin: 5px 0 0 0; color: var(--primary-blue);"><?php echo mysqli_num_rows($history_res); ?></h2>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid #f59e0b;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid var(--accent-maroon);">
                     <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Last Check-up</p>
-                    <h2 style="margin: 5px 0 0 0; color: #1e293b;">Recent</h2>
+                    <h2 style="margin: 5px 0 0 0; color: var(--primary-blue);">Recent</h2>
                 </div>
             </div>
 
             <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                <h3 style="color: #1e293b; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
                     <span style="background: #3b82f6; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem;">📋</span> 
                     Medical Timeline
                 </h3>
@@ -106,7 +116,7 @@ $history_res = mysqli_query($conn, $history_sql);
                                     </div>
                                     <div style="text-align: right;">
                                         <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Facility</p>
-                                        <p style="margin: 0; font-weight: 600; color: #1e293b;"><?php echo $record['facility_name'] ?? 'National Hospital'; ?></p>
+                                        <p style="margin: 0; font-weight: 600; color: var(--primary-blue);"><?php echo $record['facility_name'] ?? 'National Hospital'; ?></p>
                                     </div>
                                 </div>
 
@@ -116,7 +126,7 @@ $history_res = mysqli_query($conn, $history_sql);
 
                                 <div style="display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 0.85rem;">
                                     <div style="width: 24px; height: 24px; background: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">D</div>
-                                    Attending Practitioner: <span style="color: #1e293b; font-weight: 600;">Dr. <?php echo $record['doctor_name']; ?></span>
+                                    Attending Practitioner: <span style="color: var(--primary-blue); font-weight: 600;">Dr. <?php echo $record['doctor_name']; ?></span>
                                 </div>
                             </div>
                         <?php endwhile; ?>
@@ -134,3 +144,5 @@ $history_res = mysqli_query($conn, $history_sql);
 
 </body>
 </html>
+
+

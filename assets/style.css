@@ -1,7 +1,7 @@
 /* Color Palette */
 :root {
-    --primary-blue: #1e3a8a;   /* Deep Blue */
-    --accent-maroon: #800000;  /* Classic Maroon */
+    --primary-blue: #004d40;   
+    --accent-maroon: #800000;  
     --light-gray: #f4f4f9;
     --white: #ffffff;
 }
@@ -102,14 +102,14 @@ button:hover {
     gap: 20px;
 }
 
-/* Dashboard Content Area */
+
 .container {
     padding: 100px 50px 20px 50px; 
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Navbar Fixes */
+
 .navbar {
     background-color: var(--primary-blue);
     color: white;
@@ -136,14 +136,13 @@ button:hover {
     border-radius: 4px;
 }
 
-/* Sidebar and Layout */
-/* Update these specific sections in your style.css */
+
 
 body {
     margin: 0;
     padding: 0;
     display: flex;
-    flex-direction: column; /* Stack navbar on top of the content */
+    flex-direction: column; 
 }
 
 .navbar {
@@ -163,22 +162,22 @@ body {
     align-items: center;
 }
 
-/* Fix the layout container */
+
 .dashboard-wrapper {
     display: grid;
-    grid-template-columns: 260px 1fr; /* Sidebar width + remaining space */
-    min-height: calc(100vh - 70px); /* Fill screen minus navbar height */
+    grid-template-columns: 260px 1fr; 
+    min-height: calc(100vh - 70px); 
     width: 100%;
 }
 
-/* Sidebar Container */
+
 .sidebar {
-    background-color: #1a3a5a; /* Darker professional blue */
+    background-color: #1a3a5a; 
     color: white;
     padding: 25px 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Space between links */
+    gap: 10px; 
 }
 
 .sidebar h4 {
@@ -191,7 +190,7 @@ body {
     padding-bottom: 10px;
 }
 
-/* Individual Sidebar Links */
+
 .sidebar-link {
     display: flex;
     align-items: center;
@@ -204,19 +203,19 @@ body {
     font-size: 0.95rem;
 }
 
-/* Hover Effect */
+
 .sidebar-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffcccc;
-    padding-left: 20px; /* Moves slightly to the right on hover */
+    padding-left: 20px; 
 }
 
-/* Active State (optional - highlights the current page) */
+
 .sidebar-link.active {
     background-color: var(--accent-maroon);
     color: white;
 }
-/* Stats Cards */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -238,7 +237,7 @@ body {
     font-size: 2rem;
     color: var(--accent-maroon);
 }
-/* Header Navigation Styles */
+
 .navbar {
     background-color: var(--primary-blue);
     padding: 10px 0;
@@ -267,7 +266,7 @@ body {
 }
 
 .nav-logo span {
-    color: #ffcccc; /* Subtle highlight for 'Poa' */
+    color: #ffcccc; 
 }
 
 .nav-links {
@@ -306,7 +305,7 @@ body {
     color: #666;
     margin: 5px 0 0;
 }
-/* Pharmacy Dashboard Overrides (scoped) */
+
 body.dashboard-page {
     background-color: #f8f9fa;
     min-height: 100vh;
@@ -318,8 +317,8 @@ body.dashboard-page {
 }
 
 body.dashboard-page .navbar {
-    background-color: #004d40;
-    border-bottom: 4px solid #00796b;
+    background-color: var(--primary-blue);
+    border-bottom: 4px solid var(--accent-maroon);
     position: sticky;
     top: 0;
 }
@@ -329,7 +328,7 @@ body.dashboard-page .nav-container {
 }
 
 body.dashboard-page .nav-logo span {
-    color: #b2dfdb;
+    color: #ffcccc;
 }
 
 body.dashboard-page .dashboard-wrapper {
@@ -337,24 +336,24 @@ body.dashboard-page .dashboard-wrapper {
 }
 
 body.dashboard-page .sidebar {
-    background-color: #004d40;
+    background-color: var(--primary-blue);
     color: #ffffff;
     padding: 24px 16px;
 }
 
 body.dashboard-page .sidebar h4 {
-    color: #b2dfdb;
-    border-bottom: 1px solid #4db6ac;
+    color: #ffcccc;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 0;
 }
 
 body.dashboard-page .sidebar-link:hover {
     background-color: rgba(255, 255, 255, 0.12);
-    color: #b2dfdb;
+    color: #ffcccc;
 }
 
 body.dashboard-page .sidebar-link.active {
-    background-color: #00796b;
+    background-color: var(--accent-maroon);
     color: #ffffff;
 }
 
@@ -367,7 +366,7 @@ body.dashboard-page .sidebar-profile {
 
 body.dashboard-page .sidebar-profile-label {
     margin: 0;
-    color: #b2dfdb;
+    color: #ffcccc;
     font-size: 0.8rem;
 }
 

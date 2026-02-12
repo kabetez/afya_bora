@@ -43,14 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Clinical Encounter | Afya Poa</title>
+    <title>New Clinical Encounter | Afya Bora</title>
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body class="dashboard-page">
 
     <nav class="navbar">
         <div class="nav-container">
-            <span class="nav-logo">Afya Poa | National Data Entry</span>
+            <span class="nav-logo">Afya Bora | National Data Entry</span>
             <ul class="nav-links">
                 <li><a href="../doctor_dashboard.php">Dashboard</a></li>
                 <li><a href="search.php">Back to Registry</a></li>

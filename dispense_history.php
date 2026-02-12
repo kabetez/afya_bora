@@ -57,7 +57,7 @@ $total_history = mysqli_fetch_assoc($count_res)['total'] ?? 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Afya Poa | Dispense History</title>
+    <title>Afya Bora | Dispense History</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="dashboard-page">
@@ -158,3 +158,4 @@ $total_history = mysqli_fetch_assoc($count_res)['total'] ?? 0;
     </div>
 </body>
 </html>
+

@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <nav class="navbar">
         <div class="nav-container">
-            <span class="nav-logo">Afya Poa | Registry Update</span>
+            <span class="nav-logo">Afya Bora | Registry Update</span>
             <ul class="nav-links">
                 <li><a href="../doctor_dashboard.php">Dashboard</a></li>
                 <li><a href="view.php?id=<?php echo $parent_id; ?>">Back to Patient File</a></li>

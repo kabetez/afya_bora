@@ -55,7 +55,7 @@ if (isset($_GET['id'])) {
 
     <nav class="navbar">
         <div class="nav-container">
-            <span class="nav-logo">Afya Poa | National Health Record</span>
+            <span class="nav-logo">Afya Bora | National Health Record</span>
             <ul class="nav-links">
                 <li><a href="../doctor_dashboard.php">Dashboard</a></li>
                 <li><a href="search.php">Back to Search</a></li>

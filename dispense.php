@@ -75,7 +75,7 @@ $total_pending = mysqli_fetch_assoc($total_q)['total'] ?? 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Afya Poa | Pharmacy Portal</title>
+    <title>Afya Bora | Pharmacy Portal</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="dashboard-page">
@@ -172,4 +172,5 @@ $total_pending = mysqli_fetch_assoc($total_q)['total'] ?? 0;
     </div>
 </body>
 </html>
+
 

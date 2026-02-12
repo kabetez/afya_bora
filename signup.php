@@ -21,8 +21,19 @@ if (isset($_POST['signup_btn'])) {
         $message = "Error: This National ID is already registered.";
     } else {
         // 2. SAVE TO USERS (All fields are now required)
-        $user_sql = "INSERT INTO users (username, password, role, license_no, hospital_name) 
-                     VALUES ('$id_number', '$hashed_password', '$role', '$license', '$hospital')";
+        $has_full_name_col = false;
+        $full_name_col_q = mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'full_name'");
+        if ($full_name_col_q && mysqli_num_rows($full_name_col_q) > 0) {
+            $has_full_name_col = true;
+        }
+
+        if ($has_full_name_col) {
+            $user_sql = "INSERT INTO users (username, full_name, password, role, license_no, hospital_name) 
+                         VALUES ('$id_number', '$full_name', '$hashed_password', '$role', '$license', '$hospital')";
+        } else {
+            $user_sql = "INSERT INTO users (username, password, role, license_no, hospital_name) 
+                         VALUES ('$id_number', '$hashed_password', '$role', '$license', '$hospital')";
+        }
         
         if (mysqli_query($conn, $user_sql)) {
             header("Location: login.php?success=Professional Account Created! Login with ID: $id_number and Password: $first_name");
